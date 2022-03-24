@@ -1,0 +1,64 @@
+Notes: 
+-skimage.util.pad no longer exists as of scikit-image 0.19, changed to np.pad (numpy is shortened to np inside of the python files)
+
+The current errror now is: 
+cv2.error: OpenCV(4.5.5) D:\a\opencv-python\opencv-python\opencv\modules\imgproc\src\color.cpp:182: error: (-215:Assertion failed) !_src.empty() in function 'cv::cvtColor'
+I really dont know what this means I dont know were the cvtColor function is located in the color file. 
+Possible fix, the directory shown in the error does not exist on my laptop, changing the directory properly to locate the color file might remove the error.
+
+Going to reinstall OpenCV into main python folder for easier acess to library
+no effect
+
+within the imageTools file inside of the "def load" section on line 32 there is a directory leading to the data folder. 
+The issue most likely lies within that portion and the directory must be changed
+cv2.error: OpenCV(4.5.5) D:\a\opencv-python\opencv-python\opencv\modules\imgproc\src\color.cpp:182: error: (-215:Assertion failed) !_src.empty() in function 'cv::cvtColor'
+Line 32 (where error occurs): return cv2.cvtColor(cv2.imread("../data/"+directory+"/"+name),cv2.COLOR_BGR2RGB)
+To fix this I had to change the directory to the first image in the file it is trying to read, so
+C:\Python\Corrosion detection2\corrosion-detection-master\data\test\(name of first image)(ex:
+This fixed the issue and the program is finally able to import and begin to classify the images.
+
+Now that the images are inputted the error is believed to be within this line 
+mask = morphology.remove_small_holes(label(mask)[0],min_size=minPix) after researching the error it seems to have to do with scikit-image again, 
+reading the changelogs I believe I need to use area_threshold instead of min_size
+
+In the Image.py file there is an issue on line 99 and 126: if self.hsHist != None and hist != None:
+ValueError: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+adding .any() after each of the Hist seems to work
+
+The program finally works and inputs the names of the files that contain corrosion in a text document in the results folder.
+
+When trying to run tes with hs and edge threshold files the program shows an error.
+File "C:\Python\Corrosion detection2\corrosion-detection-master\src\main.py", line 23, in getInput
+    edgeThr = sys.arg[3]
+AttributeError: module 'sys' has no attribute 'arg'. Did you mean: 'argv'?
+Will come back to this. will try using argv, this doesn't work, nevermind this does work idk what i was doing wrong
+
+Next up:
+File "C:\Python\Corrosion detection2\corrosion-detection-master\src\imageTools.py", line 557, in compareThr
+    return int(np.all(comp[methods] > thresh))
+TypeError: '>' not supported between instances of 'numpy.ndarray' and 'str'
+This is where im actually stuck I dont understand python logic n stuff. Pankaj possibly?
+Pankaj helped and now the code fully runs without errors. 
+
+remind me to tell u that the code i have also has a "pixel by pixel" camera frame i dunno what it is or what it does but
+
+
+The code is technically complete but it still says all the images are corroded. Now we need to look at this:
+	
+def writeResults(clf):
+	res = open("../results/results_"+testDir+".txt","w+")
+	for im in clf.test:
+		if im.label == 1:
+			res.write(im.name+"\n")
+	res.close()
+Im acc lost
+Maybe not, the program prints the name of the file if it has an assigned value of 1, we need to find where in the program it is giving these values and fix the algorith or some shit
+No idea how but first ill try finding where im.label is located
+-classifier.py line 165-171
+
+
+EMERGENCY CODE:
+avoid blue picture
+
+
+
